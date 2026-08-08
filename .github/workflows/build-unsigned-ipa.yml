@@ -1,64 +1,46 @@
-name: Build unsigned IPA (for Sideloadly)
+name: Build Unsigned IPA
 
-# Собирает .app без подписи Apple и упаковывает в .ipa.
-# Подпись под ваш бесплатный Apple ID делает Sideloadly уже на компьютере
-# при установке на телефон — здесь никакой Apple Developer аккаунт не нужен.
 on:
-  workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
 
 jobs:
-  build-unsigned-ipa:
-    runs-on: macos-15
-    env:
-      PROJECT: PatientPlanner.xcodeproj
-      SCHEME: PatientPlanner
+  build:
+    name: Build iOS App and generate IPA
+    runs-on: macos-14
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Select latest Xcode (with iOS 26 SDK)
+      - name: Set up Xcode
         run: |
-          ls /Applications | grep -i Xcode
-          LATEST_XCODE=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
-          echo "Using: $LATEST_XCODE"
-          sudo xcode-select -s "$LATEST_XCODE"
+          sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
           xcodebuild -version
-          xcodebuild -showsdks | grep -i iphoneos
 
-      - name: Build (no code signing)
+      - name: Build app (Unsigned)
         run: |
-          set -e
-          xcodebuild \
-            -project "$PROJECT" \
-            -scheme "$SCHEME" \
-            -configuration Release \
-            -sdk iphoneos \
-            -derivedDataPath "$RUNNER_TEMP/build" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            clean build
+          xcodebuild -project PatientPlanner.xcodeproj \
+                     -scheme PatientPlanner \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     CODE_SIGN_IDENTITY="" \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGNING_ALLOWED=NO \
+                     clean build
 
-      - name: Package .ipa
+      - name: Package IPA
         run: |
-          set -e
-          APP_PATH="$RUNNER_TEMP/build/Build/Products/Release-iphoneos/PatientPlanner.app"
-          PAYLOAD_DIR="$RUNNER_TEMP/Payload"
+          mkdir -p Payload
+          # Переносим скомпилированное приложение в папку Payload для архивации в ipa
+          cp -R ~/Library/Developer/Xcode/DerivedData/*/Build/Products/Release-iphoneos/PatientPlanner.app Payload/
+          zip -r PatientPlanner-unsigned.ipa Payload
+          rm -rf Payload
 
-          mkdir -p "$PAYLOAD_DIR"
-          cp -R "$APP_PATH" "$PAYLOAD_DIR/"
-
-          cd "$RUNNER_TEMP"
-          zip -r PatientPlanner.ipa Payload
-          mkdir -p "$GITHUB_WORKSPACE/out"
-          cp PatientPlanner.ipa "$GITHUB_WORKSPACE/out/PatientPlanner.ipa"
-
-      - name: Upload .ipa as artifact
+      - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PatientPlanner-ipa
-          path: out/PatientPlanner.ipa
-          retention-days: 14
+          name: PatientPlanner-unsigned-ipa
+          path: PatientPlanner-unsigned.ipa
