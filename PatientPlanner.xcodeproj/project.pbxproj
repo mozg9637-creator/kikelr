@@ -17,6 +17,10 @@
 		A1000001AAAA0001B0001008 /* PatientsSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001AAAA0001B0000008 /* PatientsSearchView.swift */; };
 		A1000001AAAA0001B0001009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000001AAAA0001B0000009 /* Assets.xcassets */; };
 		A1000001AAAA0001B0001010 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001AAAA0001B0000010 /* NotificationManager.swift */; };
+		A1000001AAAA0001B0001011 /* NotificationDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001AAAA0001B0000011 /* NotificationDiagnosticsView.swift */; };
+		A1000001AAAA0001B0001012 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001AAAA0001B0000012 /* AppLogger.swift */; };
+		A1000001AAAA0001B0001013 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001AAAA0001B0000013 /* SettingsView.swift */; };
+		A1000001AAAA0001B0001014 /* DeveloperSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001AAAA0001B0000014 /* DeveloperSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +35,10 @@
 		A1000001AAAA0001B0000008 /* PatientsSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientsSearchView.swift; sourceTree = "<group>"; };
 		A1000001AAAA0001B0000009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000001AAAA0001B0000010 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		A1000001AAAA0001B0000011 /* NotificationDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDiagnosticsView.swift; sourceTree = "<group>"; };
+		A1000001AAAA0001B0000012 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		A1000001AAAA0001B0000013 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A1000001AAAA0001B0000014 /* DeveloperSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +67,7 @@
 				A1000001AAAA0001B0000002 /* RootView.swift */,
 				A1000001AAAA0001B0000003 /* ColorHex.swift */,
 				A1000001AAAA0001B0000010 /* NotificationManager.swift */,
+				A1000001AAAA0001B0000012 /* AppLogger.swift */,
 				A1000001AAAA0001B0003004 /* Models */,
 				A1000001AAAA0001B0003005 /* Views */,
 				A1000001AAAA0001B0000009 /* Assets.xcassets */,
@@ -89,6 +98,9 @@
 				A1000001AAAA0001B0000006 /* AppointmentFormView.swift */,
 				A1000001AAAA0001B0000007 /* DoctorsView.swift */,
 				A1000001AAAA0001B0000008 /* PatientsSearchView.swift */,
+				A1000001AAAA0001B0000011 /* NotificationDiagnosticsView.swift */,
+				A1000001AAAA0001B0000013 /* SettingsView.swift */,
+				A1000001AAAA0001B0000014 /* DeveloperSettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -166,6 +178,10 @@
 				A1000001AAAA0001B0001002 /* RootView.swift in Sources */,
 				A1000001AAAA0001B0001003 /* ColorHex.swift in Sources */,
 				A1000001AAAA0001B0001010 /* NotificationManager.swift in Sources */,
+				A1000001AAAA0001B0001011 /* NotificationDiagnosticsView.swift in Sources */,
+				A1000001AAAA0001B0001012 /* AppLogger.swift in Sources */,
+				A1000001AAAA0001B0001013 /* SettingsView.swift in Sources */,
+				A1000001AAAA0001B0001014 /* DeveloperSettingsView.swift in Sources */,
 				A1000001AAAA0001B0001004 /* Models.swift in Sources */,
 				A1000001AAAA0001B0001005 /* ScheduleView.swift in Sources */,
 				A1000001AAAA0001B0001006 /* AppointmentFormView.swift in Sources */,

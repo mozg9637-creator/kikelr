@@ -39,7 +39,8 @@ struct AppointmentFormView: View {
         _notes = State(initialValue: appointment?.notes ?? "")
         _isBlocked = State(initialValue: appointment?.isBlocked ?? false)
         _isPreliminary = State(initialValue: appointment?.isPreliminary ?? true)
-        _reminderMinutes = State(initialValue: appointment?.reminderMinutesBefore ?? 30)
+        let defaultReminder = UserDefaults.standard.object(forKey: "defaultReminderMinutes") as? Int ?? 30
+        _reminderMinutes = State(initialValue: appointment?.reminderMinutesBefore ?? defaultReminder)
     }
 
     var body: some View {

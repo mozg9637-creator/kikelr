@@ -4,6 +4,7 @@ import SwiftData
 struct RootView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \Doctor.sortOrder) private var doctors: [Doctor]
+    @AppStorage("accentColorHex") private var accentColorHex: String = "8A6FD8"
 
     var body: some View {
         TabView {
@@ -15,7 +16,11 @@ struct RootView: View {
 
             DoctorsView()
                 .tabItem { Label("Врачи", systemImage: "stethoscope") }
+
+            SettingsView()
+                .tabItem { Label("Настройки", systemImage: "gearshape") }
         }
+        .tint(Color(hex: accentColorHex))
         .task {
             seedDoctorsIfNeeded()
             NotificationManager.shared.requestAuthorizationIfNeeded()
