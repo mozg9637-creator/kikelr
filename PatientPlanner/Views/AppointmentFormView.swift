@@ -1,168 +1,76 @@
 import SwiftUI
-import SwiftData
 
 struct AppointmentFormView: View {
-    @Environment(\.modelContext) private var context
-    @Environment(\.dismiss) private var dismiss
-
-    let doctors: [Doctor]
-    let appointment: Appointment?
-
-    @State private var selectedDoctorID: UUID
-    @State private var date: Date
-    @State private var patientName: String
-    @State private var patientPhone: String
-    @State private var notes: String
-    @State private var isBlocked: Bool
-    @State private var isPreliminary: Bool
-    @State private var reminderMinutes: Int
-    @State private var showDeleteConfirm = false
-
-    private static let reminderOptions: [(label: String, value: Int)] = [
-        ("Без напоминания", -1),
-        ("В момент приёма", 0),
-        ("За 15 минут", 15),
-        ("За 30 минут", 30),
-        ("За 1 час", 60),
-        ("За 2 часа", 120),
-        ("За день", 1440)
-    ]
-
-    init(doctors: [Doctor], initialDoctor: Doctor?, initialDate: Date, appointment: Appointment?) {
-        self.doctors = doctors
-        self.appointment = appointment
-
-        _selectedDoctorID = State(initialValue: appointment?.doctorID ?? initialDoctor?.id ?? doctors.first?.id ?? UUID())
-        _date = State(initialValue: appointment?.date ?? initialDate)
-        _patientName = State(initialValue: appointment?.patientName ?? "")
-        _patientPhone = State(initialValue: appointment?.patientPhone ?? "")
-        _notes = State(initialValue: appointment?.notes ?? "")
-        _isBlocked = State(initialValue: appointment?.isBlocked ?? false)
-        _isPreliminary = State(initialValue: appointment?.isPreliminary ?? true)
-        let defaultReminder = UserDefaults.standard.object(forKey: "defaultReminderMinutes") as? Int ?? 30
-        _reminderMinutes = State(initialValue: appointment?.reminderMinutesBefore ?? defaultReminder)
-    }
+    @State var appointment: PatientAppointment
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("Врач и время") {
-                    Picker("Врач", selection: $selectedDoctorID) {
-                        ForEach(doctors) { doctor in
-                            Text(doctor.name).tag(doctor.id)
-                        }
-                    }
-                    DatePicker("Дата", selection: $date, displayedComponents: .date)
-                    DatePicker("Время", selection: $date, displayedComponents: .hourAndMinute)
+        Form {
+            // MARK: - Шапка и основные параметры
+            Section(header: Text("Параметры осмотра")) {
+                DatePicker("Дата", selection: $appointment.inspectionDate, displayedComponents: [.date, .hourAndMinute])
+                
+                Picker("Тип формы", selection: $appointment.inspectionType) {
+                    Text("Взрослая").tag("Взрослая")
+                    Text("Детская").tag("Детская")
                 }
-
-                Section {
-                    Toggle("Слот заблокирован", isOn: $isBlocked)
+                
+                TextField("Врач", text: $appointment.doctorName)
+                TextField("Медсестра", text: $appointment.nurseName)
+            }
+            
+            // MARK: - Анамнез и осмотр
+            Section(header: Text("Анамнез и статус")) {
+                TextField("Жалобы", text: $appointment.complaints, axis: .vertical)
+                TextField("Аллергологический анамнез", text: $appointment.allergicAnamnesis, axis: .vertical)
+                TextField("Анамнез заболевания", text: $appointment.diseaseAnamnesis, axis: .vertical)
+                TextField("Анамнез жизни", text: $appointment.lifeAnamnesis, axis: .vertical)
+                TextField("Внешний осмотр", text: $appointment.externalExamination, axis: .vertical)
+                TextField("Объективно", text: $appointment.objectively, axis: .vertical)
+                TextField("Прикус", text: $appointment.bite, axis: .vertical)
+                TextField("Результаты рентгеновских исследований", text: $appointment.xRayResults, axis: .vertical)
+            }
+            
+            // MARK: - Диагностика
+            Section(header: Text("Диагноз и слизистые")) {
+                Picker("Слизистые", selection: $appointment.mucousMembrane) {
+                    Text("Норма").tag("Норма")
+                    Text("Гиперемия").tag("Гиперемия")
+                    Text("Бледная").tag("Бледная")
                 }
-
-                if !isBlocked {
-                    Section("Пациент") {
-                        TextField("ФИО пациента", text: $patientName)
-                        TextField("Телефон", text: $patientPhone)
-                            .keyboardType(.phonePad)
-                        Toggle("Предварительная запись", isOn: $isPreliminary)
-                    }
-
-                    Section("Заметки") {
-                        TextField("Комментарий", text: $notes, axis: .vertical)
-                            .lineLimit(3...6)
-                    }
-
-                    Section("Напоминание") {
-                        Picker("Напомнить", selection: $reminderMinutes) {
-                            ForEach(Self.reminderOptions, id: \.value) { option in
-                                Text(option.label).tag(option.value)
-                            }
-                        }
-                        Text("Локальное уведомление на этом устройстве, интернет не нужен.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                if appointment != nil {
-                    Section {
-                        Button("Удалить запись", role: .destructive) {
-                            showDeleteConfirm = true
-                        }
-                    }
+                
+                Toggle("Санация полости рта", isOn: $appointment.isSanationCompleted)
+                Toggle("Требуется протезирование", isOn: $appointment.requiresProsthetics)
+                
+                TextField("Общий диагноз по МКБ-10", text: $appointment.icd10Diagnosis)
+            }
+            
+            // MARK: - Лечение
+            Section(header: Text("План и лечение")) {
+                TextField("План лечения", text: $appointment.treatmentPlan, axis: .vertical)
+                TextField("Анестезия", text: $appointment.anesthesia, axis: .vertical)
+                TextField("Лечение", text: $appointment.treatment, axis: .vertical)
+                TextField("Назначения", text: $appointment.prescriptions, axis: .vertical)
+            }
+            
+            // MARK: - Листок нетрудоспособности
+            Section(header: Text("Листок нетрудоспособности")) {
+                Toggle("Оформить ЛН", isOn: $appointment.isSickLeaveIssued)
+                
+                if appointment.isSickLeaveIssued {
+                    DatePicker("Выдан с", selection: $appointment.sickLeaveStartDate, displayedComponents: .date)
+                    DatePicker("по", selection: $appointment.sickLeaveEndDate, displayedComponents: .date)
+                    TextField("№ ЛН", text: $appointment.sickLeaveNumber)
                 }
             }
-            .navigationTitle(appointment == nil ? "Новая запись" : "Редактирование")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Отмена") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Сохранить") { save() }
-                        .disabled(!isBlocked && patientName.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
-            .confirmationDialog("Удалить эту запись?", isPresented: $showDeleteConfirm, titleVisibility: .visible) {
-                Button("Удалить", role: .destructive) { delete() }
-                Button("Отмена", role: .cancel) {}
-            }
-        }
-    }
-
-    private var selectedDoctor: Doctor? {
-        doctors.first(where: { $0.id == selectedDoctorID })
-    }
-
-    private func save() {
-        guard let doctor = selectedDoctor else { return }
-
-        if let appt = appointment {
-            appt.doctorID = doctor.id
-            appt.doctorName = doctor.name
-            appt.date = date
-            appt.patientName = isBlocked ? "" : patientName
-            appt.patientPhone = isBlocked ? "" : patientPhone
-            appt.notes = isBlocked ? "" : notes
-            appt.isBlocked = isBlocked
-            appt.isPreliminary = isPreliminary
-            appt.reminderMinutesBefore = reminderMinutes
-
-            try? context.save()
-            if isBlocked || reminderMinutes < 0 {
-                NotificationManager.shared.cancelReminder(for: appt)
-            } else {
-                NotificationManager.shared.scheduleReminder(for: appt, minutesBefore: reminderMinutes)
-            }
-        } else {
-            let newAppt = Appointment(
-                doctorID: doctor.id,
-                doctorName: doctor.name,
-                date: date,
-                patientName: isBlocked ? "" : patientName,
-                patientPhone: isBlocked ? "" : patientPhone,
-                notes: isBlocked ? "" : notes,
-                isBlocked: isBlocked,
-                isPreliminary: isPreliminary,
-                reminderMinutesBefore: reminderMinutes
-            )
-            context.insert(newAppt)
-            try? context.save()
-            if !isBlocked && reminderMinutes >= 0 {
-                NotificationManager.shared.scheduleReminder(for: newAppt, minutesBefore: reminderMinutes)
+            
+            // MARK: - Рекомендации
+            Section(header: Text("Итог")) {
+                TextField("Общие рекомендации", text: $appointment.generalRecommendations, axis: .vertical)
             }
         }
-
-        dismiss()
-    }
-
-    private func delete() {
-        if let appt = appointment {
-            NotificationManager.shared.cancelReminder(for: appt)
-            context.delete(appt)
-            try? context.save()
-        }
-        dismiss()
+        .navigationTitle("Осмотр стоматолога")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
 }
