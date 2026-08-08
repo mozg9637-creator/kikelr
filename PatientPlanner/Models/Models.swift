@@ -1,6 +1,6 @@
 import Foundation
 
-// Дополнительные данные стоматолога
+// Детали стоматологического осмотра (новые поля с фото)
 struct StomatologyDetails: Codable {
     var complaints: String = ""
     var allergicAnamnesis: String = ""
@@ -20,21 +20,21 @@ struct StomatologyDetails: Codable {
     var prescriptions: String = ""
     var generalRecommendations: String = ""
     
-    // ЛН
+    // Листок нетрудоспособности
     var isSickLeaveIssued: Bool = false
     var sickLeaveStartDate: Date = Date()
     var sickLeaveEndDate: Date = Date()
     var sickLeaveNumber: String = ""
 }
 
-// Дополняем существующую структуру Appointment (или аналогичную из вашего проекта)
+// Основная модель встречи/осмотра (сохраняет старый функционал + новые данные)
 struct Appointment: Identifiable, Codable {
     var id: UUID = UUID()
-    // СТАРЫЙ ФУНКЦИОНАЛ (сохраняем)
     var patientName: String
     var doctorName: String
+    var doctorID: String = "" // Совместимость с PatientsSearchView
     var date: Date
     
-    // НОВЫЙ ФУНКЦИОНАЛ (добавляем)
-    var stomatologyDetails: StomatologyDetails? 
+    // Новые расширенные данные осмотра
+    var stomatologyDetails: StomatologyDetails?
 }
