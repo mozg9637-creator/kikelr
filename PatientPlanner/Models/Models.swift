@@ -1,17 +1,41 @@
 import Foundation
 import SwiftData
 
-// MARK: - Врач / кабинет
+// Детали стоматологического осмотра
+struct StomatologyDetails: Codable {
+    var complaints: String = ""
+    var allergicAnamnesis: String = ""
+    var diseaseAnamnesis: String = ""
+    var lifeAnamnesis: String = ""
+    var externalExamination: String = ""
+    var objectively: String = ""
+    var bite: String = ""
+    var xRayResults: String = ""
+    var mucousMembrane: String = "Норма"
+    var isSanationCompleted: Bool = false
+    var requiresProsthetics: Bool = false
+    var icd10Diagnosis: String = ""
+    var treatmentPlan: String = ""
+    var anesthesia: String = ""
+    var treatment: String = ""
+    var prescriptions: String = ""
+    var generalRecommendations: String = ""
+    
+    var isSickLeaveIssued: Bool = false
+    var sickLeaveStartDate: Date = Date()
+    var sickLeaveEndDate: Date = Date()
+    var sickLeaveNumber: String = ""
+}
 
 @Model
 final class Doctor {
-    var id: UUID
+    var id: UUID = UUID()
     var name: String
     var room: String
     var colorHex: String
     var sortOrder: Int
-
-    init(name: String, room: String = "", colorHex: String = "8A6FD8", sortOrder: Int = 0) {
+    
+    init(name: String, room: String, colorHex: String, sortOrder: Int) {
         self.id = UUID()
         self.name = name
         self.room = room
@@ -20,10 +44,9 @@ final class Doctor {
     }
 }
 
-// MARK: - Запись на приём
-
 @Model
 final class Appointment {
+<<<<<<< HEAD
     var id: UUID
     var doctorID: UUID
     var doctorName: String       // дублируем имя врача на момент записи, чтобы история не терялась при удалении врача
@@ -52,17 +75,30 @@ final class Appointment {
         self.doctorName = doctorName
         self.date = date
         self.patientID = patientID
+=======
+    var id: UUID = UUID()
+    var patientName: String
+    var doctorName: String
+    var doctorID: String = ""
+    var date: Date
+    
+    // Старый функционал (блокировка и напоминания)
+    var isBlocked: Bool = false
+    var reminderMinutesBefore: Int = 15
+    
+    // Новые данные стоматологического осмотра
+    var stomatologyDetails: StomatologyDetails?
+    
+    init(patientName: String, doctorName: String, doctorID: String, date: Date, isBlocked: Bool = false, reminderMinutesBefore: Int = 15, stomatologyDetails: StomatologyDetails? = nil) {
+        self.id = UUID()
+>>>>>>> fb62e05b1b001a8119bde77d6bcd9541aa4c6a2c
         self.patientName = patientName
-        self.patientPhone = patientPhone
-        self.notes = notes
+        self.doctorName = doctorName
+        self.doctorID = doctorID
+        self.date = date
         self.isBlocked = isBlocked
-        self.isPreliminary = isPreliminary
-        self.createdAt = Date()
         self.reminderMinutesBefore = reminderMinutesBefore
-    }
-
-    var isFree: Bool {
-        !isBlocked && patientName.trimmingCharacters(in: .whitespaces).isEmpty
+        self.stomatologyDetails = stomatologyDetails
     }
 }
 
