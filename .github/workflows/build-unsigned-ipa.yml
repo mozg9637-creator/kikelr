@@ -34,7 +34,6 @@ jobs:
       - name: Package IPA
         run: |
           mkdir -p Payload
-          # Переносим скомпилированное приложение в папку Payload для архивации в ipa
           cp -R ~/Library/Developer/Xcode/DerivedData/*/Build/Products/Release-iphoneos/PatientPlanner.app Payload/
           zip -r PatientPlanner-unsigned.ipa Payload
           rm -rf Payload
@@ -43,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: PatientPlanner-unsigned-ipa
-          path: PatientPlanner-unsigned.ipa
+          path: PatientPlanner-unsigned-ipa.ipa
